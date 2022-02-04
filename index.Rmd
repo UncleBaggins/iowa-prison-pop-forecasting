@@ -42,30 +42,41 @@ Column {.sidebar data-width=250}
 -----------------------------------------------------------------------
 
 ```{r}
+
+offenseDetails <- reactive(forecast_prison_pop %>%
+  select(offense_classifications, offense_types, offense_subtypes) %>%
+  filter(offense_classifications %in% filteroffenseClass()) %>% 
+  filter(offense_types %in% filteroffenseType()) %>% 
+  filter(offense_subtypes %in% filteroffenseSubtype()) %>% 
+  distinct())
+
 offenseClasss <- forecast_prison_pop %>%
   select(offense_classifications) %>%
-  distinct() 
+  distinct()
 
 selectInput("offenseClass", label = h4("Offense Classification"), 
     choices = sort(offenseClasss$offense_classifications),
+    # choices = sort(unique(offenseDetails()$offense_classifications)),
     selected = 'A Felony-Violent',
     multiple = F)
 
 offenseType <- forecast_prison_pop %>%
   select(offense_types) %>%
-  distinct() 
+  distinct()
 
 selectInput("offenseType", label = h4("Offense Type"), 
     choices = sort(offenseType$offense_types),
+    # choices = sort(unique(offenseDetails()$offense_types)),
     selected = 'Violent',
     multiple = F)
 
 offenseSubtype <- forecast_prison_pop %>%
   select(offense_subtypes) %>%
-  distinct() 
+  distinct()
 
 selectInput("offenseSubtype", label = h4("Offense Subtype"), 
     choices = sort(offenseSubtype$offense_subtypes),
+    # choices = sort(unique(offenseDetails()$offense_subtypes)),
     selected = 'Kidnap',
     multiple = F)
 
@@ -275,6 +286,10 @@ genderSplits <- reactive({
 
   })
 
+filterTest <- reactive({
+  offenseDetails()
+})
+
 ```
 
 ### Race/Ethnicity Demographic Splits
@@ -298,6 +313,15 @@ renderDataTable(genderSplits(),
 
 ```
 
+### Filter Values Test
+
+```{r}
+
+renderDataTable(filterTest(), 
+                escape = TRUE, 
+                options = list(scrollX=TRUE, autoWidth=TRUE, autoHeight=TRUE, paging=FALSE, info=FALSE, searching=FALSE, ordering=FALSE))
+
+```
 
 
 About {data-icon="ion-information-circled"}
